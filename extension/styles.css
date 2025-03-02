@@ -1,0 +1,10 @@
+.clickable-text {
+    color: blue;
+    text-decoration: underline;
+  }
+  
+  .clickable-text:hover {
+    cursor: pointer;
+    color: darkblue;
+  }
+  
