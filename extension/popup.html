@@ -1,35 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Text Simplifier</title>
   <style>
-    body { 
-      width: 200px; 
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    button { 
-      width: 100%; 
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+    .simplify-button {
+      padding: 10px 20px;
+      border: 2px solid #6EC1E4;
+      background-color: transparent;
+      color: #6EC1E4;
       font-size: 16px;
-      transition: background-color 0.3s ease;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 5px;
     }
-    button:hover {
-      background-color: #45a049;
+  
+    .simplify-button:hover {
+      background-color: #6EC1E4;
+      color: white;
+    }
+  
+    .simplify-button:focus {
+      outline: none;
     }
   </style>
 </head>
 <body>
-  <button id="simplifyBtn">Simplify Text</button>
+  <h1>SimplyFy</h1>
+  <button id="simplifyBtn" class="simplify-button">Simplify</button>
   <script src="popup.js"></script>
 </body>
 </html>
