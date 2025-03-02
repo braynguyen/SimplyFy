@@ -1,25 +1,33 @@
 {
-    "manifest_version": 3,
-    "name": "Text Simplifier",
-    "version": "1.0",
-    "description": "Simplify text on the page.",
-    "permissions": ["activeTab", "scripting"],
-    "background": {
-      "service_worker": "background.js"
-    },
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"]
-      }
-    ],
-    "action": {
-      "default_popup": "popup.html",
-      "default_icon": "icons/icon.png"
-    },
-    "icons": {
-      "16": "icons/icon.png",
-      "48": "icons/icon.png",
-      "128": "icons/icon.png"
+  "manifest_version": 3,
+  "name": "Text Simplifier",
+  "version": "1.0",
+  "description": "Simplify text on the page.",
+  "permissions": ["activeTab", "scripting", "commands"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
     }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icons/icon.png"
+  },
+  "commands": {
+    "simplify-action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+K"
+      },
+      "description": "Run simplify script"
+    }
+  },
+  "icons": {
+    "16": "icons/icon.png",
+    "48": "icons/icon.png",
+    "128": "icons/icon.png"
+  }
 }
