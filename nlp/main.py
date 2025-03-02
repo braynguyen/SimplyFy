@@ -34,7 +34,9 @@ def simplify_text(request: TextSimplificationRequest):
     try:
         # Create the prompt asking Gemini to simplify the text
         print(request.text)
-        prompt = f"""Simplify the following text sentence by sentence and returning the simplified text and only the simplified text: 
+        prompt = f"""Simplify the following text sentence by sentence and returning the simplified text and only the simplified text. 
+        
+        If the text does not need to be simplified or you do not not know how to simplify just return the text: 
         
         Here is the text: {request.text}"""
 

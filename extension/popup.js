@@ -7,10 +7,10 @@ document.getElementById("simplifyBtn").addEventListener("click", () => {
       return;
     }
 
-    // Ensure that the script is executed in the active tab
+    // run the script in the active tab
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id },
-      files: ['content.js'], // Inject the content.js file
+      files: ['content.js'],
     });
   });
 });

@@ -1,2 +1,3 @@
 nlp/.venv
 nlp/.env
+nlp/__pycache__/
