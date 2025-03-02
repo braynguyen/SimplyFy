@@ -18,7 +18,7 @@ SimplyFy is a Chrome extension that allows users to highlight any text on a webp
 3. Click **Load unpacked** and select the `/extensions` folder of the project.
 4. The SimplyFy extension should now be loaded into Chrome.
 
-## Running the NLP Server
+## Running the FastAPI Server
 SimplyFy requires a backend to process text simplifications using NLP techniques. To set up the NLP server:
 
 1. Open a terminal and navigate to the `nlp` folder.
