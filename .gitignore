@@ -1,3 +1,4 @@
 nlp/.venv
+nlp/.venv-openai
 nlp/.env
 nlp/__pycache__/
