@@ -25,6 +25,7 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 
 class TextSimplificationRequest(BaseModel):
     text: str
+    context: str
 
 class TextSimplificationResponse(BaseModel):
     simplified_text: str
@@ -38,7 +39,10 @@ def simplify_text(request: TextSimplificationRequest):
         
         If the text does not need to be simplified or you do not not know how to simplify just return the text: 
         
-        Here is the text: {request.text}"""
+        Here is the context of the previous simplified text: {request.context}
+
+        Here is the text: {request.text}
+        """
 
         # Call the Gemini API to generate simplified text
         response = client.models.generate_content(

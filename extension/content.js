@@ -15,27 +15,32 @@ function simplifyText() {
             const textNodes = getTextNodesInRange(selectedContents);
 
             // simplify each text node individually
-            textNodes.forEach((textNode) => {
-                const originalText = textNode.textContent.trim();
-
+            let previousText = ""
+            for (let i = 0; i < textNodes.length; i++) {
+                const originalText = textNodes[i].textContent.trim();
                 if (originalText) {
                     fetch("http://localhost:8000/simplify", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify({ text: originalText })
+                        body: JSON.stringify({
+                            text: originalText,
+                            context: previousText
+                        })
                     })
                         .then(response => response.json())
                         .then(data => {
+                            console.log(data)
                             // Replace the text node with the simplified text
-                            textNode.textContent = data.simplified_text;
+                            textNodes[i].textContent = data.simplified_text;
                         })
                         .catch(error => {
                             console.error("Error simplifying text:", error);
                         });
                 }
-            });
+                previousText = previousText + "\n" + originalText;
+            }
 
             // replace the original selected HTML with the simplified HTML
             setTimeout(() => {

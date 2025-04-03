@@ -3,12 +3,6 @@ document.getElementById("simplifyBtn").addEventListener("click", () => {
   executeSimplifyScript();
 });
 
-chrome.commands.onCommand.addListener((command) => {
-  console.log('Command received:', command);  // Add this to log the command
-  if (command === "simplify-action") {
-    executeSimplifyScript();
-  }
-});
 
 function executeSimplifyScript() {
   // Query the active tab in the current window
