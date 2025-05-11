@@ -1,4 +1,4 @@
-nlp/.venv*
-nlp/.env
-nlp/__pycache__/
-nlp/serviceAccountKey.json
+backend/.venv*
+backend/.env
+backend/__pycache__/
+backend/serviceAccountKey.json
