@@ -9,19 +9,21 @@ from firebase_admin import credentials
 from firebase_admin import db
 
 load_dotenv()
+LOGGING = False
 
 # Load the API key from environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 app = FastAPI()
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-# Initialize DB with admin priviledges
-cred = credentials.Certificate('serviceAccountKey.json')
-firebase_admin.initialize_app(cred, {
-    'databaseURL': os.getenv("DATABASE_URL")
-})
-ref = db.reference('/')
-text_ref = ref.child('text')
+if LOGGING:
+    # Initialize DB with admin priviledges
+    cred = credentials.Certificate('serviceAccountKey.json')
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': os.getenv("DATABASE_URL")
+    })
+    ref = db.reference('/')
+    text_ref = ref.child('text')
 
 # Enable CORS for the entire application
 app.add_middleware(
@@ -72,11 +74,12 @@ def simplify_text(request: TextSimplificationRequest):
         # Return the simplified text
         simplified_text = response.choices[0].message.content
 
-        text_ref.push({
-            'original': request.text,
-            'simplified': simplified_text,
-            'context': request.context
-        })
+        if LOGGING:
+            text_ref.push({
+                'original': request.text,
+                'simplified': simplified_text,
+                'context': request.context
+            })
         
         return TextSimplificationResponse(simplified_text=simplified_text)
     
