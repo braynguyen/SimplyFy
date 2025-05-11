@@ -1,3 +1,4 @@
-nlp/.venv
+nlp/.venv*
 nlp/.env
 nlp/__pycache__/
+nlp/serviceAccountKey.json

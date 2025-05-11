@@ -2,14 +2,26 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
-from google import genai
+from openai import OpenAI
 from dotenv import load_dotenv
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
 
 load_dotenv()
 
 # Load the API key from environment variables
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 app = FastAPI()
+client = OpenAI(api_key=OPENAI_API_KEY)
+
+# Initialize DB with admin priviledges
+cred = credentials.Certificate('serviceAccountKey.json')
+firebase_admin.initialize_app(cred, {
+    'databaseURL': os.getenv("DATABASE_URL")
+})
+ref = db.reference('/')
+text_ref = ref.child('text')
 
 # Enable CORS for the entire application
 app.add_middleware(
@@ -20,8 +32,6 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-# Initialize the Gemini client using the genai library
-client = genai.Client(api_key=GEMINI_API_KEY)
 
 class TextSimplificationRequest(BaseModel):
     text: str
@@ -34,24 +44,40 @@ class TextSimplificationResponse(BaseModel):
 def simplify_text(request: TextSimplificationRequest):
     try:
         # Create the prompt asking Gemini to simplify the text
-        # print(request.text)
         prompt = f"""Simplify the following text sentence by sentence and returning the simplified text and only the simplified text. 
         
         If the text does not need to be simplified or you do not not know how to simplify just return the text: 
         
-        Here is the context of the previous simplified text: {request.context}
+        Given this context do not return any simplication of this text. Just use it to better simplify the given text. Here is the context of the previous simplified text: {request.context}
 
-        Here is the text: {request.text}
+        Here is the text you must simplify: {request.text}
         """
 
-        # Call the Gemini API to generate simplified text
-        response = client.models.generate_content(
-            model="gemini-2.0-flash", 
-            contents=[{"text": prompt}]
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a text simplification agent that will, given any text, return a simplified version for a reader. Do not provide anything extra to the context just make it easier to read."
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ]
         )
-        
+
+
         # Return the simplified text
-        simplified_text = response.text
+        simplified_text = response.choices[0].message.content
+
+        text_ref.push({
+            'original': request.text,
+            'simplified': simplified_text,
+            'context': request.context
+        })
+        
         return TextSimplificationResponse(simplified_text=simplified_text)
     
     except Exception as e:
