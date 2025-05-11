@@ -4,6 +4,9 @@ from pydantic import BaseModel
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
 
 load_dotenv()
 
@@ -11,6 +14,14 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 app = FastAPI()
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+# Initialize DB with admin priviledges
+cred = credentials.Certificate('serviceAccountKey.json')
+firebase_admin.initialize_app(cred, {
+    'databaseURL': os.getenv("DATABASE_URL")
+})
+ref = db.reference('/')
+text_ref = ref.child('text')
 
 # Enable CORS for the entire application
 app.add_middleware(
@@ -33,7 +44,6 @@ class TextSimplificationResponse(BaseModel):
 def simplify_text(request: TextSimplificationRequest):
     try:
         # Create the prompt asking Gemini to simplify the text
-        print(request.text)
         prompt = f"""Simplify the following text sentence by sentence and returning the simplified text and only the simplified text. 
         
         If the text does not need to be simplified or you do not not know how to simplify just return the text: 
@@ -57,11 +67,17 @@ def simplify_text(request: TextSimplificationRequest):
                 },
             ]
         )
-        print(response)
+
 
         # Return the simplified text
         simplified_text = response.choices[0].message.content
-        print(simplified_text)
+
+        text_ref.push({
+            'original': request.text,
+            'simplified': simplified_text,
+            'context': request.context
+        })
+        
         return TextSimplificationResponse(simplified_text=simplified_text)
     
     except Exception as e:

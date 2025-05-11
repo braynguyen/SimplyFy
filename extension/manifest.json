@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Text Simplifier",
+  "name": "SimplyFy",
   "version": "1.0",
   "description": "Simplify text on the page.",
   "permissions": ["activeTab", "scripting", "commands"],

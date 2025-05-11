@@ -17,7 +17,10 @@ function simplifyText() {
             // simplify each text node individually
             let previousText = ""
             for (let i = 0; i < textNodes.length; i++) {
+                console.log("original", textNodes[i].textContent)
                 const originalText = textNodes[i].textContent.trim();
+                console.log("trimmed", originalText)
+
                 if (originalText) {
                     fetch("http://localhost:8000/simplify", {
                         method: "POST",
@@ -31,7 +34,6 @@ function simplifyText() {
                     })
                         .then(response => response.json())
                         .then(data => {
-                            console.log(data)
                             // Replace the text node with the simplified text
                             textNodes[i].textContent = data.simplified_text;
                         })
