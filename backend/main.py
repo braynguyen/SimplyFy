@@ -9,10 +9,11 @@ from firebase_admin import credentials
 from firebase_admin import db
 
 load_dotenv()
-LOGGING = False
+LOGGING = True
 
 # Load the API key from environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+MODEL = "gpt-3.5-turbo"
 app = FastAPI()
 client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -41,6 +42,9 @@ class TextSimplificationRequest(BaseModel):
 
 class TextSimplificationResponse(BaseModel):
     simplified_text: str
+    prompt: str
+    system_prompt: str
+    model: str
 
 @app.post("/simplify", response_model=TextSimplificationResponse)
 def simplify_text(request: TextSimplificationRequest):
@@ -55,13 +59,14 @@ def simplify_text(request: TextSimplificationRequest):
         Here is the text you must simplify: {request.text}
         """
 
+        system_prompt = "You are a text simplification agent that will, given any text, return a simplified version for a reader. Do not provide anything extra to the context just make it easier to read."
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=MODEL,
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a text simplification agent that will, given any text, return a simplified version for a reader. Do not provide anything extra to the context just make it easier to read."
+                    "content": system_prompt
                 },
                 {
                     "role": "user",
@@ -73,15 +78,38 @@ def simplify_text(request: TextSimplificationRequest):
 
         # Return the simplified text
         simplified_text = response.choices[0].message.content
-
-        if LOGGING:
-            text_ref.push({
-                'original': request.text,
-                'simplified': simplified_text,
-                'context': request.context
-            })
         
-        return TextSimplificationResponse(simplified_text=simplified_text)
+        return TextSimplificationResponse(
+                simplified_text=simplified_text,
+                prompt=prompt,
+                system_prompt=system_prompt,
+                model=MODEL
+            )
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error simplifying text: {str(e)}")
+
+class StoreRequest(BaseModel):
+    original: str
+    simplified: str
+    prompt: str
+    system_prompt: str
+    model: str
+    url: str
+
+
+@app.post("/store")
+def store_text(request: StoreRequest):
+
+    if LOGGING:
+        text_ref.push({
+                    'original': request.original,
+                    'simplified': request.simplified,
+                    'prompt': request.prompt,
+                    'system_prompt': request.system_prompt,
+                    'model': request.model,
+                    'url': request.url
+                })
+        return {"status": "success"}, 200
+    else:
+        return {"detail": "Logging is not enabled"}, 400

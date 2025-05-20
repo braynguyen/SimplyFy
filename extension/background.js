@@ -2,11 +2,20 @@ chrome.runtime.onInstalled.addListener(() => {
     console.log("Text Simplifier Extension Installed");
   });
   
-// Listen for command (keyboard shortcut) to trigger simplify action
 chrome.commands.onCommand.addListener((command) => {
-  console.log('Command received:', command); // Log the command received
+  console.log('Command received:', command);
   if (command === "simplify-action") {
     executeSimplifyScript();
+  }
+});
+
+// gets the current tab
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.type === "getCurrentTabUrl") {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      sendResponse({url: tabs[0].url});
+    });
+    return true; // Required for async sendResponse
   }
 });
 
